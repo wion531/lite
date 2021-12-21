@@ -1,6 +1,7 @@
 #include "api.h"
 #include "renderer.h"
 #include "rencache.h"
+#include "glrenderer.h"
 
 
 static RenColor checkcolor(lua_State *L, int idx, int def) {
@@ -23,7 +24,9 @@ static RenColor checkcolor(lua_State *L, int idx, int def) {
 
 static int f_show_debug(lua_State *L) {
   luaL_checkany(L, 1);
+#ifdef RENDER_SOFT
   rencache_show_debug(lua_toboolean(L, 1));
+#endif
   return 0;
 }
 
@@ -38,13 +41,21 @@ static int f_get_size(lua_State *L) {
 
 
 static int f_begin_frame(lua_State *L) {
+#if RENDER_SOFT
   rencache_begin_frame();
+#else
+  glren_begin_frame();
+#endif
   return 0;
 }
 
 
 static int f_end_frame(lua_State *L) {
+#if RENDER_SOFT
   rencache_end_frame();
+#else
+  glren_end_frame();
+#endif
   return 0;
 }
 
@@ -55,7 +66,11 @@ static int f_set_clip_rect(lua_State *L) {
   rect.y = luaL_checknumber(L, 2);
   rect.width = luaL_checknumber(L, 3);
   rect.height = luaL_checknumber(L, 4);
+#if RENDER_SOFT
   rencache_set_clip_rect(rect);
+#else
+  glren_set_clip_rect(rect);
+#endif
   return 0;
 }
 
@@ -67,7 +82,11 @@ static int f_draw_rect(lua_State *L) {
   rect.width = luaL_checknumber(L, 3);
   rect.height = luaL_checknumber(L, 4);
   RenColor color = checkcolor(L, 5, 255);
+#if RENDER_SOFT
   rencache_draw_rect(rect, color);
+#else
+  glren_draw_rect(rect, color);
+#endif
   return 0;
 }
 
@@ -78,7 +97,11 @@ static int f_draw_text(lua_State *L) {
   int x = luaL_checknumber(L, 3);
   int y = luaL_checknumber(L, 4);
   RenColor color = checkcolor(L, 5, 255);
+#if RENDER_SOFT
   x = rencache_draw_text(*font, text, x, y, color);
+#else
+  x = glren_draw_text(*font, text, x, y, color);
+#endif
   lua_pushnumber(L, x);
   return 1;
 }

@@ -6,8 +6,7 @@ local config = require "core.config"
 local style = require "core.style"
 
 -- light theme:
--- require "user.colors.summer"
+-- require "user.colors.william"
 
 -- key binding:
 -- keymap.add { ["ctrl+escape"] = "core:quit" }
-

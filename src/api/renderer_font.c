@@ -1,6 +1,7 @@
 #include "api.h"
 #include "renderer.h"
 #include "rencache.h"
+#include "glrenderer.h"
 
 
 static int f_load(lua_State *L) {
@@ -24,7 +25,13 @@ static int f_set_tab_width(lua_State *L) {
 
 static int f_gc(lua_State *L) {
   RenFont **self = luaL_checkudata(L, 1, API_TYPE_FONT);
-  if (*self) { rencache_free_font(*self); }
+  if (*self) {
+#ifdef RENDER_SOFT
+    rencache_free_font(*self);
+#else
+    glren_free_font(*self);
+#endif
+  }
   return 0;
 }
 

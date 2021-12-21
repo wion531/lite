@@ -1,8 +1,19 @@
+#ifdef _WIN32
+#include <SDL/SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
+
 #include <stdbool.h>
 #include <ctype.h>
-#include <dirent.h>
+#ifdef _MSC_VER
+  #include "lib/msvc_dirent.h"
+#else
+  #include <dirent.h>
+#endif
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include <errno.h>
 #include <sys/stat.h>
 #include "api.h"

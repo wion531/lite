@@ -2,29 +2,9 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <math.h>
-#include "lib/stb/stb_truetype.h"
+#include <stdlib.h>
 #include "renderer.h"
-
-#define MAX_GLYPHSET 256
-
-struct RenImage {
-  RenColor *pixels;
-  int width, height;
-};
-
-typedef struct {
-  RenImage *image;
-  stbtt_bakedchar glyphs[256];
-} GlyphSet;
-
-struct RenFont {
-  void *data;
-  stbtt_fontinfo stbfont;
-  GlyphSet *sets[MAX_GLYPHSET];
-  float size;
-  int height;
-};
-
+#include "glrenderer.h"
 
 static SDL_Window *window;
 static struct { int left, top, right, bottom; } clip;
@@ -145,6 +125,12 @@ retry:
     uint8_t n = *((uint8_t*) set->image->pixels + i);
     set->image->pixels[i] = (RenColor) { .r = 255, .g = 255, .b = 255, .a = n };
   }
+  set->image->pixels[0] = (RenColor) { 255, 255, 255, 255 };
+
+  /* make opengl texture */
+#if RENDER_OPENGL
+  set->gltex = glren_make_font_texture(set);
+#endif
 
   return set;
 }

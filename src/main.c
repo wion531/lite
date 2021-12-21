@@ -1,5 +1,11 @@
 #include <stdio.h>
+
+#ifdef _MSC_VER
+#include <SDL/SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
+
 #include "api/api.h"
 #include "renderer.h"
 
@@ -11,6 +17,11 @@
   #include <mach-o/dyld.h>
 #endif
 
+#ifndef RENDER_OPENGL
+  #define RENDER_SOFT
+#else
+  #include "glrenderer.h"
+#endif
 
 SDL_Window *window;
 
@@ -60,7 +71,6 @@ static void init_window_icon(void) {
 #endif
 }
 
-
 int main(int argc, char **argv) {
 #ifdef _WIN32
   HINSTANCE lib = LoadLibrary("user32.dll");
@@ -83,12 +93,20 @@ int main(int argc, char **argv) {
   SDL_DisplayMode dm;
   SDL_GetCurrentDisplayMode(0, &dm);
 
+#if RENDER_OPENGL
+  window = SDL_CreateWindow(
+    "", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, dm.w * 0.8, dm.h * 0.8,
+    SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+#else
   window = SDL_CreateWindow(
     "", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, dm.w * 0.8, dm.h * 0.8,
     SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_HIDDEN);
+#endif
   init_window_icon();
   ren_init(window);
-
+#if RENDER_OPENGL
+  glren_init(window);
+#endif
 
   lua_State *L = luaL_newstate();
   luaL_openlibs(L);
