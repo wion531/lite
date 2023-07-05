@@ -1,5 +1,5 @@
 # lite
-wion531's personal fork of lite, a lightweight text editor written in Lua
+my personal fork of lite, a lightweight text editor written in Lua
 
 ## Overview
 My fork:
